@@ -26,9 +26,6 @@ public class SmsService {
         }
     }
 
-    // ------------------------------------------
-    //  🔥 UNIVERSAL CUSTOM MESSAGE SENDER
-    // ------------------------------------------
     public void sendCustomSMS(String to, String message) {
         try {
             initTwilio();
@@ -39,16 +36,15 @@ public class SmsService {
                     message
             ).create();
 
-            System.out.println("📨 SMS sent to " + to);
+            System.out.println("SMS sent to " + to);
 
         } catch (Exception e) {
-            System.err.println("❌ Error sending SMS: " + e.getMessage());
+            System.err.println("Error sending SMS: " + e.getMessage());
         }
     }
 
-    // ------------------------------------------
-    //  🔥 CUSTOMIZED PERSON MATCH MESSAGE
-    // ------------------------------------------
+  
+    //   CUSTOMIZED PERSON MATCH MESSAGE
     public void sendPersonMatchSMS(
             String lostPhone,
             String foundPhone,
@@ -59,28 +55,27 @@ public class SmsService {
     ) {
 
         String msgToLost =
-                "🔔 PERSON MATCH FOUND!\n\n"
+                " PERSON MATCH FOUND!\n\n"
                 + "Someone matching your missing person has been reported.\n\n"
-                + "📍 Location: " + foundAt + "\n"
-                + "⏰ Time: " + time + "\n"
-                + "🎯 Match Confidence: " + Math.round(confidence) + "%\n"
-                + "🖼 Photo: " + imageUrl + "\n\n"
-                + "📞 Finder Contact: " + foundPhone + "\n"
+                + " Location: " + foundAt + "\n"
+                + " Time: " + time + "\n"
+                + " Match Confidence: " + Math.round(confidence) + "%\n"
+                + " Photo: " + imageUrl + "\n\n"
+                + " Finder Contact: " + foundPhone + "\n"
                 + "Please contact immediately.";
 
         String msgToFinder =
-                "📢 YOU REPORTED A PERSON WHO MATCHES A MISSING CASE!\n\n"
+                " YOU REPORTED A PERSON WHO MATCHES A MISSING CASE!\n\n"
                 + "The missing person's family may contact you.\n"
-                + "📞 Family Contact: " + lostPhone + "\n\n"
-                + "Thanks for helping! 🙏";
+                + " Family Contact: " + lostPhone + "\n\n"
+                + "Thanks for helping!";
 
         sendCustomSMS(lostPhone, msgToLost);
         sendCustomSMS(foundPhone, msgToFinder);
     }
 
-    // ------------------------------------------
-    //  🔥 CUSTOMIZED ITEM MATCH MESSAGE
-    // ------------------------------------------
+    //   CUSTOMIZED ITEM MATCH MESSAGE
+ 
     public void sendItemMatchSMS(
             String ownerPhone,
             String finderPhone,
@@ -91,19 +86,19 @@ public class SmsService {
     ) {
 
         String msgToOwner =
-                "🎉 ITEM MATCH FOUND!\n\n"
+                " ITEM MATCH FOUND!\n\n"
                 + "An item matching your lost item has been reported.\n\n"
-                + "📍 Found At: " + location + "\n"
-                + "⏰ Time: " + time + "\n"
-                + "🎯 Match Confidence: " + Math.round(confidence) + "%\n"
-                + "🖼 Photo: " + imageUrl + "\n\n"
-                + "📞 Finder Contact: " + finderPhone + "\n";
+                + " Found At: " + location + "\n"
+                + " Time: " + time + "\n"
+                + " Match Confidence: " + Math.round(confidence) + "%\n"
+                + " Photo: " + imageUrl + "\n\n"
+                + " Finder Contact: " + finderPhone + "\n";
 
         String msgToFinder =
-                "📢 YOU REPORTED AN ITEM THAT MATCHES A LOST REPORT!\n\n"
-                + "📞 Owner Contact: " + ownerPhone + "\n"
+                " YOU REPORTED AN ITEM THAT MATCHES A LOST REPORT!\n\n"
+                + " Owner Contact: " + ownerPhone + "\n"
                 + "They may contact you soon.\n"
-                + "Thank you for your honesty 🙏";
+                + "Thank you for your honesty ";
 
         sendCustomSMS(ownerPhone, msgToOwner);
         sendCustomSMS(finderPhone, msgToFinder);

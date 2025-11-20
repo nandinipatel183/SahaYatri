@@ -1,18 +1,26 @@
 import React from "react";
-import { Home, Users, FileText, PieChart, Cpu, Settings2, LogOut } from "lucide-react";
+import { Home, Users, FileText, PieChart, Cpu, Settings2, LogOut, Camera } from "lucide-react";
 
 interface Props {
   tab: string;
-  setTab: (t: "overview" | "users" | "reports" | "analytics" | "matches" | "settings") => void;
+  setTab: (
+    t: "overview" | "users" | "reports" | "analytics" | "matches" | "settings" | "cctv"
+  ) => void;
   onLogout?: () => void;
   userName?: string;
 }
 
-const NavButton: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
+const NavButton: React.FC<{
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}> = ({ active, onClick, children }) => (
   <button
     onClick={onClick}
     className={`px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition ${
-      active ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg" : "text-gray-700 hover:bg-gray-100"
+      active
+        ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+        : "text-gray-700 hover:bg-gray-100"
     }`}
   >
     {children}
@@ -54,11 +62,18 @@ const AdminNavbar: React.FC<Props> = ({ tab, setTab, onLogout, userName }) => {
             <NavButton active={tab === "matches"} onClick={() => setTab("matches")}>
               <Settings2 className="h-4 w-4" /> AI Matches
             </NavButton>
+
+            {/* ⭐ NEW CCTV DETECTION TAB */}
+            <NavButton active={tab === "cctv"} onClick={() => setTab("cctv")}>
+              <Camera className="h-4 w-4" /> CCTV Detection
+            </NavButton>
           </nav>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="text-sm text-gray-700">Signed in as <span className="font-semibold">{userName ?? "Admin"}</span></div>
+          <div className="text-sm text-gray-700">
+            Signed in as <span className="font-semibold">{userName ?? "Admin"}</span>
+          </div>
           <button
             onClick={() => onLogout?.()}
             className="px-3 py-2 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 flex items-center gap-2"

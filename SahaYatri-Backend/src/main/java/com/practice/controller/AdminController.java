@@ -15,22 +15,18 @@ import java.util.Map;
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "http://localhost:5173")
 public class AdminController {
-
+	
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private JwtUtil jwtUtil;
-
-
+    
     // VALIDATE ADMIN TOKEN
     private boolean isAdmin(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return false;
         String token = authHeader.substring(7);
         return jwtUtil.extractRole(token).equals("ADMIN");
     }
-
-
     /** GET ALL USERS */
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String auth) {
@@ -39,8 +35,6 @@ public class AdminController {
 
         return ResponseEntity.ok(userRepository.findAll());
     }
-
-
     /** APPROVE USER */
     @PatchMapping("/approve/{id}")
     public ResponseEntity<?> approveUser(

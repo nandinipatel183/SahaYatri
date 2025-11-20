@@ -2,6 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import VolunteerNavbar from "./VolunteerNavbar";
 import { Users, Package, MapPin, Trash2, Clock } from "lucide-react";
+import { mapData } from "./MapNavigation";
+
 import {
   ResponsiveContainer,
   LineChart,
@@ -12,6 +14,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+// import OfflineMaps from "./MapNavigation";
 
 /**
  * VolunteerDashboard.tsx
@@ -209,8 +212,10 @@ const VolunteerDashboard: React.FC = () => {
     r?.photoUrls || r?.photoUrl || r?.photoPaths || r?.image || null;
 
   // derived counts
-  const totalPendingPeople = (lostPeople?.length || 0) + (foundPeople?.length || 0);
-  const totalPendingItems = (lostItems?.length || 0) + (foundItems?.length || 0);
+  const totalPendingPeople =
+    (lostPeople?.length || 0) + (foundPeople?.length || 0);
+  const totalPendingItems =
+    (lostItems?.length || 0) + (foundItems?.length || 0);
 
   // table row components
   const PersonRow: React.FC<{
@@ -228,7 +233,9 @@ const VolunteerDashboard: React.FC = () => {
         />
       </td>
       <td className="py-3 px-2">{r.name || r.reporterName || "—"}</td>
-      <td className="py-3 px-2">{r.lastSeenLocation || r.foundLocation || "—"}</td>
+      <td className="py-3 px-2">
+        {r.lastSeenLocation || r.foundLocation || "—"}
+      </td>
       <td className="py-3 px-2 text-sm text-gray-600">
         {r.lastSeenTime || r.foundTime || "—"}
       </td>
@@ -269,7 +276,9 @@ const VolunteerDashboard: React.FC = () => {
         />
       </td>
       <td className="py-3 px-2">{r.itemName || r.category || "—"}</td>
-      <td className="py-3 px-2">{r.lastSeenLocation || r.foundLocation || "—"}</td>
+      <td className="py-3 px-2">
+        {r.lastSeenLocation || r.foundLocation || "—"}
+      </td>
       <td className="py-3 px-2 text-sm text-gray-600">
         {r.lastSeenTime || r.foundTime || "—"}
       </td>
@@ -308,8 +317,12 @@ const VolunteerDashboard: React.FC = () => {
           </div>
 
           <div className="flex gap-4 items-center">
-            <div className="bg-white px-3 py-2 rounded shadow text-sm">Pending People: <strong>{totalPendingPeople}</strong></div>
-            <div className="bg-white px-3 py-2 rounded shadow text-sm">Pending Items: <strong>{totalPendingItems}</strong></div>
+            <div className="bg-white px-3 py-2 rounded shadow text-sm">
+              Pending People: <strong>{totalPendingPeople}</strong>
+            </div>
+            <div className="bg-white px-3 py-2 rounded shadow text-sm">
+              Pending Items: <strong>{totalPendingItems}</strong>
+            </div>
           </div>
         </div>
 
@@ -322,29 +335,41 @@ const VolunteerDashboard: React.FC = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <h4 className="text-sm text-gray-500">Pending People</h4>
-                    <div className="text-3xl font-bold">{totalPendingPeople}</div>
+                    <div className="text-3xl font-bold">
+                      {totalPendingPeople}
+                    </div>
                   </div>
                   <Users className="w-8 h-8 text-green-600" />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">People reported and awaiting action</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  People reported and awaiting action
+                </p>
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow">
                 <div className="flex justify-between items-center">
                   <div>
                     <h4 className="text-sm text-gray-500">Pending Items</h4>
-                    <div className="text-3xl font-bold">{totalPendingItems}</div>
+                    <div className="text-3xl font-bold">
+                      {totalPendingItems}
+                    </div>
                   </div>
                   <Package className="w-8 h-8 text-emerald-600" />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Items reported and awaiting action</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Items reported and awaiting action
+                </p>
               </div>
 
               <div className="bg-white p-6 rounded-2xl shadow">
                 <h4 className="text-sm text-gray-500">Quick Stats</h4>
                 <div className="mt-3">
-                  <div className="text-sm text-gray-700">Today verifications <strong>3</strong></div>
-                  <div className="text-sm text-gray-700">AI flagged matches <strong>5</strong></div>
+                  <div className="text-sm text-gray-700">
+                    Today verifications <strong>3</strong>
+                  </div>
+                  <div className="text-sm text-gray-700">
+                    AI flagged matches <strong>5</strong>
+                  </div>
                 </div>
               </div>
             </div>
@@ -366,8 +391,6 @@ const VolunteerDashboard: React.FC = () => {
           </>
         )}
 
-        
-
         {/* Lost Reports (two-column) */}
         {tab === "lostReports" && (
           <div className="grid lg:grid-cols-2 gap-6">
@@ -386,11 +409,19 @@ const VolunteerDashboard: React.FC = () => {
                 </thead>
                 <tbody>
                   {lostPeople.map((p) => (
-                    <PersonRow key={`lostlist-${p.id}`} r={p} isLost onVerify={verifyLostPerson} onDelete={deleteLostPerson} />
+                    <PersonRow
+                      key={`lostlist-${p.id}`}
+                      r={p}
+                      isLost
+                      onVerify={verifyLostPerson}
+                      onDelete={deleteLostPerson}
+                    />
                   ))}
                 </tbody>
               </table>
-              {lostPeople.length === 0 && <p className="text-gray-500 mt-3">No lost people found.</p>}
+              {lostPeople.length === 0 && (
+                <p className="text-gray-500 mt-3">No lost people found.</p>
+              )}
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow">
@@ -408,11 +439,19 @@ const VolunteerDashboard: React.FC = () => {
                 </thead>
                 <tbody>
                   {lostItems.map((i) => (
-                    <ItemRow key={`lostitemslist-${i.id}`} r={i} isLost onVerify={verifyLostItem} onDelete={deleteLostItem} />
+                    <ItemRow
+                      key={`lostitemslist-${i.id}`}
+                      r={i}
+                      isLost
+                      onVerify={verifyLostItem}
+                      onDelete={deleteLostItem}
+                    />
                   ))}
                 </tbody>
               </table>
-              {lostItems.length === 0 && <p className="text-gray-500 mt-3">No lost items found.</p>}
+              {lostItems.length === 0 && (
+                <p className="text-gray-500 mt-3">No lost items found.</p>
+              )}
             </div>
           </div>
         )}
@@ -435,11 +474,19 @@ const VolunteerDashboard: React.FC = () => {
                 </thead>
                 <tbody>
                   {foundPeople.map((p) => (
-                    <PersonRow key={`foundlist-${p.id}`} r={p} isLost={false} onVerify={verifyFoundPerson} onDelete={deleteFoundPerson} />
+                    <PersonRow
+                      key={`foundlist-${p.id}`}
+                      r={p}
+                      isLost={false}
+                      onVerify={verifyFoundPerson}
+                      onDelete={deleteFoundPerson}
+                    />
                   ))}
                 </tbody>
               </table>
-              {foundPeople.length === 0 && <p className="text-gray-500 mt-3">No found people found.</p>}
+              {foundPeople.length === 0 && (
+                <p className="text-gray-500 mt-3">No found people found.</p>
+              )}
             </div>
 
             <div className="bg-white p-6 rounded-2xl shadow">
@@ -457,22 +504,85 @@ const VolunteerDashboard: React.FC = () => {
                 </thead>
                 <tbody>
                   {foundItems.map((i) => (
-                    <ItemRow key={`founditemslist-${i.id}`} r={i} isLost={false} onVerify={verifyFoundItem} onDelete={deleteFoundItem} />
+                    <ItemRow
+                      key={`founditemslist-${i.id}`}
+                      r={i}
+                      isLost={false}
+                      onVerify={verifyFoundItem}
+                      onDelete={deleteFoundItem}
+                    />
                   ))}
                 </tbody>
               </table>
-              {foundItems.length === 0 && <p className="text-gray-500 mt-3">No found items found.</p>}
+              {foundItems.length === 0 && (
+                <p className="text-gray-500 mt-3">No found items found.</p>
+              )}
             </div>
           </div>
         )}
-
-        {/* Map */}
         {tab === "map" && (
-          <div className="bg-white p-6 rounded-2xl shadow">
-            <h3 className="text-xl font-semibold mb-4">Map View</h3>
-            <div className="w-full h-96 bg-gray-100 rounded flex items-center justify-center">
-              <MapPin className="w-10 h-10 text-gray-400" />
-              <span className="ml-3 text-gray-500">Map placeholder — integrate your map provider here</span>
+          <div className="min-h-screen bg-[#FFF7E6]">
+            <div className="text-center mt-6">
+              <h1 className="text-3xl font-bold text-gray-900">Offline Maps</h1>
+              <p className="text-gray-600 mt-1">
+                Explore maps & emergency contacts for crowded locations.
+              </p>
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex justify-center mt-6 px-4">
+              <div className="flex w-full md:w-2/3 lg:w-1/2 gap-2">
+                <input
+                  type="text"
+                  placeholder="Search for an area..."
+                  className="flex-1 px-4 py-3 rounded-xl bg-white shadow-md border border-gray-200"
+                />
+                <button className="px-5 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold shadow-md">
+                  Search
+                </button>
+              </div>
+            </div>
+
+            {/* Dynamic Maps (3 examples) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 mt-8 pb-10">
+              {mapData.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl shadow-md p-4"
+                >
+                  <img
+                    src={item.image}
+                    className="w-full h-48 object-cover rounded-xl"
+                  />
+                  <h3 className="text-xl font-bold mt-3">{item.area}</h3>
+
+                  <p className="font-semibold mt-2">
+                    Active Volunteers: {item.volunteers}
+                  </p>
+
+                  <p className="font-semibold mt-3">Volunteer Contacts:</p>
+                  <ul className="text-sm ml-4 list-disc">
+                    {item.volunteerContacts.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
+
+                  <p className="font-semibold mt-3">Police Contacts:</p>
+                  <ul className="text-sm ml-4 list-disc">
+                    {item.policeContacts.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
+
+                  <a
+                    href={item.image}
+                    download
+                    className="mt-4 block text-center bg-green-600 text-white py-2 rounded-xl font-semibold hover:bg-green-700"
+                  >
+                    Download Map
+                  </a>
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -481,7 +591,9 @@ const VolunteerDashboard: React.FC = () => {
         {tab === "stats" && (
           <div className="grid lg:grid-cols-2 gap-6">
             <div className="bg-white p-6 rounded-2xl shadow">
-              <h3 className="text-xl font-semibold mb-4">Weekly Verifications</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Weekly Verifications
+              </h3>
               <div style={{ height: 220 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={dailyStats}>

@@ -21,6 +21,7 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.List;
 
+
 @Service
 public class ItemMatchService {
 
@@ -29,10 +30,10 @@ public class ItemMatchService {
     private final SmsService smsService;
     private final ItemMatchRepository itemMatchRepository;
 
-    private static final double IMAGE_WEIGHT = 0.75;  
-    private static final double ATTR_WEIGHT = 0.25;  
-    private static final int PHASH_SIZE = 8;         
-    private static final int PHASH_RESIZE = 32;      
+    private static final double IMAGE_WEIGHT = 0.75;
+    private static final double ATTR_WEIGHT = 0.25;
+    private static final int PHASH_SIZE = 8;
+    private static final int PHASH_RESIZE = 32;
 
     @Value("${match.items.confidence.threshold:70.0}")
     private double CONFIDENCE_THRESHOLD;
@@ -52,20 +53,22 @@ public class ItemMatchService {
         this.itemMatchRepository = itemMatchRepository;
     }
 
-    // -------------------------------------------------------------------
+    
     // 🔥 MATCH LOST ITEM WITH ALL FOUND ITEMS
-    // -------------------------------------------------------------------
+    
     @Transactional
     public void matchItemsForLost(LostItem lost) {
         if (lost == null) return;
 
         List<FoundItem> allFound = foundItemRepo.findAll();
         for (FoundItem found : allFound) {
+
             if (lost.getPhotoPaths() == null || found.getPhotoUrl() == null) continue;
 
             double confidence = computeConfidenceForPair(lost, found);
 
             if (confidence >= CONFIDENCE_THRESHOLD) {
+
                 saveItemMatch(lost, found, confidence);
 
                 try {
@@ -78,30 +81,35 @@ public class ItemMatchService {
                             confidence
                     );
                 } catch (Exception ex) {
-                    System.err.println("⚠️ SMS Error: " + ex.getMessage());
+                    System.err.println(" SMS Error: " + ex.getMessage());
                 }
 
-                System.out.println("✅ Item auto-match saved — Lost #" + lost.getId()
-                        + " <-> Found #" + found.getId()
-                        + " confidence: " + confidence);
+                // REMOVE FROM BOTH TABLES
+                lostItemRepo.deleteById(lost.getId());
+                foundItemRepo.deleteById(found.getId());
+
+                System.out.println(" MATCHED ITEM REMOVED FROM TABLES");
+
+                break; // stop matching further
             }
         }
     }
 
-    // -------------------------------------------------------------------
     // 🔥 MATCH FOUND ITEM WITH ALL LOST ITEMS
-    // -------------------------------------------------------------------
+    
     @Transactional
     public void matchItemsForFound(FoundItem found) {
         if (found == null) return;
 
         List<LostItem> allLost = lostItemRepo.findAll();
         for (LostItem lost : allLost) {
+
             if (lost.getPhotoPaths() == null || found.getPhotoUrl() == null) continue;
 
             double confidence = computeConfidenceForPair(lost, found);
 
             if (confidence >= CONFIDENCE_THRESHOLD) {
+
                 saveItemMatch(lost, found, confidence);
 
                 try {
@@ -117,9 +125,13 @@ public class ItemMatchService {
                     System.err.println("⚠️ SMS Error: " + ex.getMessage());
                 }
 
-                System.out.println("✅ Item auto-match saved — Lost #" + lost.getId()
-                        + " <-> Found #" + found.getId()
-                        + " confidence: " + confidence);
+                // REMOVE FROM TABLES
+                lostItemRepo.deleteById(lost.getId());
+                foundItemRepo.deleteById(found.getId());
+
+                System.out.println("🔥 MATCHED ITEM REMOVED FROM TABLES");
+
+                break; // stop extra processing
             }
         }
     }
@@ -128,6 +140,7 @@ public class ItemMatchService {
     // ⭐ SAVE MATCH INTO ItemMatch TABLE (CORRECT)
     // -------------------------------------------------------------------
     private void saveItemMatch(LostItem lost, FoundItem found, double confidence) {
+
         ItemMatch match = ItemMatch.builder()
                 .lostItemId(lost.getId())
                 .foundItemId(found.getId())
@@ -140,10 +153,11 @@ public class ItemMatchService {
         itemMatchRepository.save(match);
     }
 
-    // -------------------------------------------------------------------
-    // ⭐ COMBINED CONFIDENCE SCORE (0–100)
-    // -------------------------------------------------------------------
+
+    // ⭐ IMAGE + ATTRIBUTE SIMILARITY
+    
     private double computeConfidenceForPair(LostItem lost, FoundItem found) {
+
         double imageScore = 0;
 
         try {
@@ -151,24 +165,19 @@ public class ItemMatchService {
             long p2 = computePHashFromUrl(found.getPhotoUrl());
 
             int hamming = hammingDistance(p1, p2);
-            imageScore = ((64 - hamming) / 64.0) * 100.0;  
+            imageScore = ((64 - hamming) / 64.0) * 100.0;
+
         } catch (Exception e) {
             System.err.println("⚠️ pHash error: " + e.getMessage());
         }
 
         double attrScore = computeAttributeSimilarity(lost, found);
 
-        double combined = (IMAGE_WEIGHT * imageScore) + (ATTR_WEIGHT * attrScore);
-        combined = Math.max(0, Math.min(100, combined));  
-
-        return Math.round(combined * 100.0) / 100.0;
+        return Math.round((IMAGE_WEIGHT * imageScore + ATTR_WEIGHT * attrScore) * 100.0) / 100.0;
     }
 
-    // -------------------------------------------------------------------
-    // ⭐ ATTRIBUTE SIMILARITY (CATEGORY / COLOR / BRAND / UNIQUE FEATURES)
-    // -------------------------------------------------------------------
     private double computeAttributeSimilarity(LostItem l, FoundItem f) {
-        double score = 0.0;
+        double score = 0;
 
         if (safeEquals(l.getCategory(), f.getCategory())) score += 40;
         if (safeEquals(l.getColor(), f.getColor())) score += 25;
@@ -201,17 +210,16 @@ public class ItemMatchService {
 
     private Set<String> tokenize(String s) {
         if (s == null) return Set.of();
-
         String[] parts = s.toLowerCase().replaceAll("[^a-z0-9 ]", " ").split("\\s+");
-        Set<String> out = new HashSet<>();
 
+        Set<String> out = new HashSet<>();
         for (String p : parts) if (p.length() > 2) out.add(p);
+
         return out;
     }
 
-    // -------------------------------------------------------------------
-    // ⭐ pHASH IMAGE COMPARISON
-    // -------------------------------------------------------------------
+    // ⭐ pHASH IMPLEMENTATION
+
     private long computePHashFromUrl(String url) throws Exception {
         byte[] bytes = fetchUrlBytes(url);
         BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
@@ -219,15 +227,8 @@ public class ItemMatchService {
     }
 
     private byte[] fetchUrlBytes(String url) throws Exception {
-        HttpRequest req = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .header("User-Agent", "ItemMatchService")
-                .build();
-
-        HttpResponse<byte[]> resp =
-                httpClient.send(req, HttpResponse.BodyHandlers.ofByteArray());
-
+        HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
+        HttpResponse<byte[]> resp = httpClient.send(req, HttpResponse.BodyHandlers.ofByteArray());
         return resp.body();
     }
 
@@ -248,7 +249,7 @@ public class ItemMatchService {
 
         double median = median(list);
 
-        long hash = 0L;
+        long hash = 0;
         int bit = 0;
 
         for (int i = 0; i < PHASH_SIZE; i++) {
@@ -271,9 +272,11 @@ public class ItemMatchService {
     private BufferedImage resize(BufferedImage src, int w, int h) {
         Image tmp = src.getScaledInstance(w, h, Image.SCALE_SMOOTH);
         BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+
         Graphics2D g = out.createGraphics();
         g.drawImage(tmp, 0, 0, null);
         g.dispose();
+
         return out;
     }
 
@@ -283,15 +286,18 @@ public class ItemMatchService {
 
         for (int u = 0; u < N; u++) {
             for (int v = 0; v < N; v++) {
+
                 double sum = 0;
+
                 for (int i = 0; i < N; i++)
                     for (int j = 0; j < N; j++)
                         sum += f[i][j] *
                                 Math.cos(((2 * i + 1) * u * Math.PI) / (2 * N)) *
                                 Math.cos(((2 * j + 1) * v * Math.PI) / (2 * N));
 
-                double cu = u == 0 ? 1 / Math.sqrt(2) : 1;
-                double cv = v == 0 ? 1 / Math.sqrt(2) : 1;
+                double cu = (u == 0) ? (1 / Math.sqrt(2)) : 1;
+                double cv = (v == 0) ? (1 / Math.sqrt(2)) : 1;
+
                 F[u][v] = 2.0 / N * cu * cv * sum;
             }
         }

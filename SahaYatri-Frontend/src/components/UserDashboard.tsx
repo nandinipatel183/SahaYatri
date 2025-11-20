@@ -13,9 +13,7 @@ const UserDashboard: React.FC = () => {
   const [foundItems, setFoundItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // -----------------------------------------------------
-  // LOAD ALL USER REPORTS
-  // -----------------------------------------------------
+  
   useEffect(() => {
     loadAll();
   }, []);
