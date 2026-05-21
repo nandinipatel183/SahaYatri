@@ -1,4 +1,4 @@
-# SahaYatri – Lost & Found People & Items Platform
+# SahaYatri – AI based Lost & Found People & Items Platform
 
 SahaYatri is a **full‑stack intelligent Lost & Found system** designed to help reunite missing people and items with their families/owners using:
 
