@@ -1,5 +1,22 @@
 # SahaYatri – AI based Lost & Found People & Items Platform
+## 🎥 Project Demo
 
+Watch the complete demonstration of SahaYatri – AI-Powered Lost & Found Platform:
+
+[![Watch Demo](https://img.shields.io/badge/YouTube-Watch%20Demo-red?logo=youtube)](https://youtu.be/eMgozQ8PzOg?si=Eb7cSnen2o5aUfOJ)
+
+🔗 **Demo Video:** https://youtu.be/eMgozQ8PzOg?si=Eb7cSnen2o5aUfOJ
+
+### Demo Highlights
+
+- 🔍 AI-Powered Lost & Found Reporting
+- 👤 Face Recognition for Missing Person Detection
+- 📹 CCTV & Webcam-Based Matching
+- 📱 Real-Time SMS Notifications
+- 🤝 Volunteer & Admin Workflow
+- 🗺️ Location-Based Search Assistance
+- 🎯 Intelligent Reunification Platform
+  
 SahaYatri is a **full‑stack intelligent Lost & Found system** designed to help reunite missing people and items with their families/owners using:
 
 * Smart form‑based reporting
