@@ -16,6 +16,10 @@ Watch the complete demonstration of SahaYatri – AI-Powered Lost & Found Platfo
 - 🤝 Volunteer & Admin Workflow
 - 🗺️ Location-Based Search Assistance
 - 🎯 Intelligent Reunification Platform
+
+
+##  Features
+
   
 SahaYatri is a **full‑stack intelligent Lost & Found system** designed to help reunite missing people and items with their families/owners using:
 
@@ -27,8 +31,6 @@ SahaYatri is a **full‑stack intelligent Lost & Found system** designed to help
 * Offline maps for search convenience
 
 ---
-
-##  Features
 
 ###  User Roles
 
